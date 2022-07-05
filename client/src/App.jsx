@@ -5,7 +5,7 @@ import { Navbar,Welcome,Services,Footer,Transactions } from "./components";
 const App = () => {
   return (
     <div className="min-h-screen">
-      <div className="gradiant-bg-welcome">
+      <div className="gradient-bg-welcome">
       <Navbar/>
       <Welcome/>
 
