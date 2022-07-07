@@ -8,20 +8,39 @@ export const TransactionContext = React.createContext();
 const { ethereum } = window;
 
 export const TransactionsProvider = ({ children }) => {
-  const [currentAccount,setCurrentAccount] = useState([])
+  const [currentAccount,setCurrentAccount] = useState([]);
+  const [formData,setFormdata] = useState({addresTo:'' , amount:'' ,keyword:'', message:''});
+
+  const handleChange = (e,name) => {
+      setFormdata((prevState) => ({...prevState,[name]:e.target.value}))
+  }
+
 
 
   const checkIfWalletIsConnected = async () => {
-    if(!ethereum) {
-      return alert('Please Install Metamask')
+
+    try {
+
+      if(!ethereum) {
+        return alert('Please Install Metamask')
+      }
+  
+      const accounts  = await ethereum.request({method : 'eth_accounts'});
+  
+      if (accounts.length) {
+        setCurrentAccount(accounts[0])
+      }
+      else{
+        console.log('no account found')
+      }
+      console.log('acc ==>',accounts)
+      
+    } catch (error) {
+      console.log(error);
+      throw new Error('No Ethereum Object')
+      
     }
 
-    const accounts  = await ethereum.request({method : 'eth_accounts'});
-
-    if (accounts.length) {
-      setCurrentAccount(accounts[0])
-    }
-    console.log('acc ==>',accounts)
   }
 
   const connectWallet = async () => {
@@ -40,6 +59,22 @@ export const TransactionsProvider = ({ children }) => {
     }
   }
 
+
+  const sendTransactions = async () => {
+
+    try {
+      if(!ethereum) {
+        return alert('Please Install Metamask')
+      }
+  
+     // get data from form  
+      
+    } catch (error) {
+
+      
+    }
+  }
+
   useEffect( () => {
     checkIfWalletIsConnected()
   },[])
@@ -47,7 +82,8 @@ export const TransactionsProvider = ({ children }) => {
   return (
     <TransactionContext.Provider
       value={{
-        connectWallet
+        connectWallet,
+        currentAccount
       }}
     >
       {children}
