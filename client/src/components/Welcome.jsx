@@ -24,17 +24,22 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 const Welcome = () => {
 
   const {connectWallet,currentAccount,formData,handleChange,sendTransactions} = useContext(TransactionContext);
-  console.log(connectWallet)
+  // console.log(connectWallet)
 
 
   const handleSubmit = (e) => {
        const {addressTo,amount,keyword,message} = formData;
        console.log('test....')
        e.preventDefault();
-      //  if(!addressTo || !amount || !keyword || !message){
+       console.log({
+         addressTo,
+         amount,
+         keyword,
+         message
+       })
+       if(!addressTo || !amount || !keyword || !message) return ;
         sendTransactions()
 
-      //  }
   };
 
   return (
