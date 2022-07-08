@@ -6,7 +6,7 @@ import { BsInfoCircle } from "react-icons/bs";
 // import { TransactionContext } from "../context/TransactionContext";
 // import { shortenAddress } from "../utils/shortenAddress";
 import { Loader } from ".";
-import { TransactionContext } from "../context/TransactionContext";
+import {useTransactionContext}  from "../context/TransactionContext";
 
 const companyCommonStyles = "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white";
 
@@ -22,21 +22,11 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Welcome = () => {
-
-  const {connectWallet,currentAccount,formData,handleChange,sendTransactions} = useContext(TransactionContext);
-  // console.log(connectWallet)
-
+  const { currentAccount, connectWallet, handleChange, sendTransactions, formData, isLoading } = useTransactionContext()
 
   const handleSubmit = (e) => {
        const {addressTo,amount,keyword,message} = formData;
-       console.log('test....')
        e.preventDefault();
-       console.log({
-         addressTo,
-         amount,
-         keyword,
-         message
-       })
        if(!addressTo || !amount || !keyword || !message) return ;
         sendTransactions()
 

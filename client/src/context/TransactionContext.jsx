@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 
 import { contractABI, contractAddress } from "../utils/constants";
+import { useContext } from "react";
 
 export const TransactionContext = React.createContext();
 
@@ -21,6 +22,11 @@ const getEthereumContract = () => {
 
 export const TransactionsProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [transactionCount, setTransactionCount] = useState(localStorage.getItem("transactionCount"));
+  const [transactions, setTransactions] = useState([]);
+
+
   const [formData, setFormdata] = useState({
     addressTo: "",
     amount: "",
@@ -29,6 +35,7 @@ export const TransactionsProvider = ({ children }) => {
   });
 
   const handleChange = (e, name) => {
+    // console.log(e.target.value)
     setFormdata((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
 
@@ -45,7 +52,7 @@ export const TransactionsProvider = ({ children }) => {
       } else {
         console.log("no account found");
       }
-      console.log("acc ==>", accounts);
+      // console.log("acc ==>", accounts);
     } catch (error) {
       console.log(error);
       throw new Error("No Ethereum Object");
@@ -70,7 +77,7 @@ export const TransactionsProvider = ({ children }) => {
   };
 
   const sendTransactions = async () => {
-    console.log("send trans==>");
+    // console.log("send trans==>");
     try {
       if (!ethereum) {
         return alert("Please Install Metamask");
@@ -79,6 +86,31 @@ export const TransactionsProvider = ({ children }) => {
       // get data from form
       const { addressTo, amount, keyword, message } = formData;
       const transactionContract = getEthereumContract();
+      const parsedAmount = ethers.utils.parseEther(amount);
+
+
+      await ethereum.request({
+        method:'eth_sendTransaction',
+        params:[{
+          from:currentAccount,
+          to:addressTo,
+          gas:'0x5208',
+          value: parsedAmount._hex,
+
+        }]
+      })
+
+     const transactionHash = await transactionContract.addToBlockChain(addressTo,parsedAmount,message,keyword);
+
+     setIsLoading(true);
+     console.log(`Loading - ${transactionHash.hash}`);
+     await transactionHash.wait();
+     console.log(`Success - ${transactionHash.hash}`);
+     setIsLoading(false);
+
+     const transactionCount = await transactionContract.getTransactionCount();
+     setTransactionCount(transactionCount.toNumber())
+
     } catch (error) {}
   };
 
@@ -89,15 +121,20 @@ export const TransactionsProvider = ({ children }) => {
   return (
     <TransactionContext.Provider
       value={{
+        transactionCount,
         connectWallet,
+        transactions,
         currentAccount,
-        formData,
-        setFormdata,
-        handleChange,
+        isLoading,
         sendTransactions,
+        handleChange,
+        formData,
       }}
     >
       {children}
     </TransactionContext.Provider>
   );
 };
+
+
+export const useTransactionContext = () => useContext(TransactionContext);
