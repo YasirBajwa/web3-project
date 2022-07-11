@@ -47,18 +47,18 @@ export const TransactionsProvider = ({ children }) => {
 
         const availableTransactions = await transactionsContract.getAllTransactions();
 
-        const structuredTransactions = availableTransactions.map((transaction) => ({
-          addressTo: transaction.receiver,
-          addressFrom: transaction.sender,
-          timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
-          message: transaction.message,
-          keyword: transaction.keyword,
-          amount: parseInt(transaction.amount._hex) / (10 ** 18)
-        }));
+        // const structuredTransactions = availableTransactions.map((transaction) => ({
+        //   addressTo: transaction.receiver,
+        //   addressFrom: transaction.sender,
+        //   timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
+        //   message: transaction.message,
+        //   keyword: transaction.keyword,
+        //   amount: parseInt(transaction.amount._hex) / (10 ** 18)
+        // }));
 
-        console.log(structuredTransactions);
+        console.log(availableTransactions);
 
-        setTransactions(structuredTransactions);
+        // setTransactions(structuredTransactions);
       } else {
         console.log("Ethereum is not present");
       }
@@ -87,7 +87,22 @@ export const TransactionsProvider = ({ children }) => {
       throw new Error("No Ethereum Object");
     }
   };
+  const checkIfTransactionsExists = async () => {
+    try {
+      if (ethereum) {
+        const transactionsContract = createEthereumContract();
+        const currentTransactionCount = await transactionsContract.getTransactionCount();
+         const transactionCount = await transactionsContract.getTransactionCount();
 
+
+        window.localStorage.setItem("transactionCount", currentTransactionCount);
+      }
+    } catch (error) {
+      console.log(error);
+
+      throw new Error("No ethereum object");
+    }
+  };
   const connectWallet = async () => {
     try {
       if (!ethereum) return alert("Please install MetaMask.");
@@ -145,6 +160,7 @@ export const TransactionsProvider = ({ children }) => {
 
   useEffect(() => {
     checkIfWalletIsConnected();
+    checkIfTransactionsExists()
   }, []);
 
   return (
