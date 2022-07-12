@@ -8,6 +8,15 @@ export const TransactionContext = React.createContext();
 
 const { ethereum } = window;
 
+const createEthereumContract = () => {
+  const provider = new ethers.providers.Web3Provider(ethereum);
+  const signer = provider.getSigner();
+  const transactionsContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  return transactionsContract;
+};
+
+
 const getEthereumContract = () => {
   const provider = new ethers.providers.Web3Provider(ethereum);
   const signer = provider.getSigner();
@@ -47,18 +56,19 @@ export const TransactionsProvider = ({ children }) => {
 
         const availableTransactions = await transactionsContract.getAllTransactions();
 
-        // const structuredTransactions = availableTransactions.map((transaction) => ({
-        //   addressTo: transaction.receiver,
-        //   addressFrom: transaction.sender,
-        //   timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
-        //   message: transaction.message,
-        //   keyword: transaction.keyword,
-        //   amount: parseInt(transaction.amount._hex) / (10 ** 18)
-        // }));
+        const structuredTransactions = availableTransactions.map((transaction) => ({
+          addressTo: transaction.receiver,
+          addressFrom: transaction.sender,
+          timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
+          message: transaction.message,
+          keyword: transaction.keyword,
+          amount: parseInt(transaction.amount._hex) / (10 ** 18)
+        }));
 
-        console.log(availableTransactions);
+        // console.log(availableTransactions);
 
-        // setTransactions(structuredTransactions);
+        setTransactions(structuredTransactions);
+        console.log(structuredTransactions)
       } else {
         console.log("Ethereum is not present");
       }
@@ -182,4 +192,5 @@ export const TransactionsProvider = ({ children }) => {
 };
 
 
-export const useTransactionContext = () => useContext(TransactionContext);
+// export const useTransactionContext = () => useContext(TransactionContext);
+// export const useTransactionContext = () => useContext(TransactionContext);

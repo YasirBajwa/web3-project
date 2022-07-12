@@ -1,9 +1,10 @@
 import React from 'react';
-import {useTransactionContext}  from "../context/TransactionContext";
+import {TransactionContext}  from "../context/TransactionContext";
 import dummyTransaction from '../utils/dummyTransaction';
 import { shortenAddress } from "../utils/shortenAddres";
 
 import useFetch from "../hooks/useFetch";
+import { useContext } from 'react';
 
 
 const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, keyword, amount, url }) => {
@@ -48,8 +49,8 @@ const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, keyword,
 };
 
 const Transactions = () => {
-  const { transactions, currentAccount } = useTransactionContext();
-  console.log('transactions',transactions)
+  const { transactions, currentAccount } = useContext(TransactionContext);
+  // console.log('transactions',transactions)
   return (
     <div className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions">
       <div className="flex flex-col md:p-12 py-12 px-4">
